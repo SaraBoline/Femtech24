@@ -1,59 +1,48 @@
+#neopixel virker med potentiometer
 from neopixel import Neopixel
 from machine import Pin, ADC, PWM
 import time
- 
-#Knap og potentiometer
+
 button = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
+
+pixels = Neopixel(5, 0, 0, "GRB") # no, state, pin, mode
 adc = ADC(Pin(26, mode=Pin.IN))
- 
-# Brugbare konstanter
-fill = (0, 0, 0)
- 
- 
+#pwm_led = PWM(Pin(15,mode=Pin.OUT))
+#pwm_led.freq(1_000)
+
+
 def map_to_rainbow_color(value):
     num_colors = 7  # Number of colors in the rainbow
     # Map the potentiometer value to the range of rainbow colors
-    if value > 0 and value < 120:
+    if value > 0 and value < 300:
         return (255, 0, 0)  # Red
-    elif value > 121 and value < 240:
+    elif value > 301 and value < 600:
         return (255, 127, 0)  # Orange
-    elif value > 241 and value < 360:
+    elif value > 601 and value < 900:
         return (255, 255, 0)  # Yellow
-    elif value > 361 and value < 480:
+    elif value > 901 and value < 1200:
         return (0, 255, 0)  # Green
-    elif value > 481 and value < 600:
+    elif value > 1201 and value < 1500:
         return (0, 0, 255)  # Blue
-    elif value > 601 and value < 720:
+    elif value > 1501 and value < 1800:
         return (75, 0, 130)  # Indigo
-    elif value >721 and value < 840:
+    elif value >1801 and value < 2100:
         return (148, 0, 211)  # Violet
-    elif value >841 and value < 960:
-        return (255, 255, 255)  # White
-    elif value >961 and value < 3000:
-        return (0, 0, 0)  # Black / off
-   
- 
-pixPin = 0 # GPIO pin 0
-pixNum = 8
-pix = Neopixel(pixNum, 0, Pin(pixPin), "RGB")
-#pix.fill(black)
-#pix[0] = red
-#pix.show()
- 
- 
+
+
 while True:
     duty = adc.read_u16() #between ~350-65535
     low_res = duty >> 5
-    neo_color = map_to_rainbow_color(int(low_res))
-    pix.fill(fill)
-    pix[0] = neo_color
-    pix.show()
+    color = map_to_rainbow_color(int(low_res))
+    pixels.set_pixel(0, (color))
+    pixels.show()
     time.sleep_ms(100)
     #print(low_res)
     #print('#%02x%02x%02x' % color)
     if not button.value():
+        print("button pressed")
         value = low_res
-        color = '#%02x%02x%02x' % neo_color
+        neo_color = '#%02x%02x%02x' % color
         ID = "Sara"
         eye = "green"
        
@@ -62,7 +51,8 @@ while True:
  
         # Append data to CSV file
         with open("mydata.csv", "a") as f:
-            f.write(f"{value},{color},{timestamp},{ID},{eye}\n")
+            f.write(f"{value},{neo_color},{timestamp},{ID},{eye}\n")
        
         print(value, color, timestamp, ID, eye)
         time.sleep_ms(200)
+        
