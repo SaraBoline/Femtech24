@@ -43,7 +43,7 @@ while True:
         print("button pressed")
         value = low_res
         neo_color = '#%02x%02x%02x' % color
-        ID = "Sara"
+        ID = 1
         eye = "green"
        
         # Get current date and time in "YYYY-MM-DD HH:MM:SS" format
